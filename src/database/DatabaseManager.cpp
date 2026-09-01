@@ -8,30 +8,33 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
+// 外部访问入口
 DatabaseManager& DatabaseManager::instance()
 {
     static DatabaseManager manager;
     return manager;
 }
 
+// 初始化数据库
 QString DatabaseManager::initDatabase() {
+    // 获取当前文件夹的路径
     QString dirPath = QDir::currentPath();
-    QStringList filters;
-    filters << "*.db3"<<"*.db";
-    bool noExistingDB = QDir(dirPath).entryList(filters).isEmpty();
-    if (!noExistingDB) {
+    QStringList filters;    // 创建文件筛选器
+    filters << "*.db3"<<"*.db"; // 添加文件筛选器中的文件格式
+    bool noExistingDB = QDir(dirPath).entryList(filters).isEmpty(); // 检查是否存在匹配的文件
+    if (!noExistingDB) {    // 如果存在匹配的文件
         dbName = QFileDialog::getOpenFileName(nullptr, "Open Database", "", "SQLite Database (*.db3 *.db)");
     }else {
-        db = QSqlDatabase::addDatabase("QSQLITE");
-        dbName = "experiments.db";
-        db.setDatabaseName(dbName);
-        if (!db.open()) {
+        db = QSqlDatabase::addDatabase("QSQLITE");  // 添加数据库
+        dbName = "experiments.db";  // 设置数据库名称
+        db.setDatabaseName(dbName); // 绑定SQLite中的数据库文件
+        if (!db.open()) {  // 打开数据库
             qDebug() << "Failed to open database:" << db.lastError().text();
             dbName = "";
             return dbName;
         }
-        QSqlQuery query(db);
-        bool ok = query.exec(R"(
+        QSqlQuery query(db);    // 创建SQL查询对象
+        bool ok = query.exec(R"(    // 执行SQL查询（创建表）
         CREATE TABLE IF NOT EXISTS experiments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -60,6 +63,7 @@ QString DatabaseManager::initDatabase() {
     return dbName;
 }
 
+// 打开数据库
 bool DatabaseManager::openDatabase() {
     if (dbName.isEmpty())
         return false;
@@ -72,6 +76,7 @@ bool DatabaseManager::openDatabase() {
     return true;
 }
 
+// 通过id进行删除
 bool DatabaseManager::deleteExperiment(int id) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM experiments WHERE id = :id");
@@ -83,6 +88,7 @@ bool DatabaseManager::deleteExperiment(int id) {
     return true;
 }
 
+// 插入实验数据
 bool DatabaseManager::insertExperiment(const ExperimentRecord &record) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO experiments "
@@ -115,6 +121,7 @@ bool DatabaseManager::insertExperiment(const ExperimentRecord &record) {
     return true;
 }
 
+// 更新实验数据
 bool DatabaseManager::updateExperiment(int id, const ExperimentRecord &record) {
     QSqlQuery query(db);
     query.prepare("UPDATE experiments "
@@ -132,6 +139,7 @@ bool DatabaseManager::updateExperiment(int id, const ExperimentRecord &record) {
     return true;
 }
 
+// 获取实验数据总页数（未完成）
 int DatabaseManager::experimentCount(int currentPage, int pageSize) {
     Q_UNUSED(currentPage);
     QSqlQuery query(db);
