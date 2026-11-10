@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QDebug>
 
 // 外部访问入口
 DatabaseManager& DatabaseManager::instance()
@@ -25,16 +26,32 @@ QString DatabaseManager::initDatabase() {
     if (!noExistingDB) {    // 如果存在匹配的文件
         dbName = QFileDialog::getOpenFileName(nullptr, "Open Database", "", "SQLite Database (*.db3 *.db)");
     }else {
-        db = QSqlDatabase::addDatabase("QSQLITE");  // 添加数据库
-        dbName = "experiments.db";  // 设置数据库名称
-        db.setDatabaseName(dbName); // 绑定SQLite中的数据库文件
-        if (!db.open()) {  // 打开数据库
-            qDebug() << "Failed to open database:" << db.lastError().text();
-            dbName = "";
-            return dbName;
-        }
-        QSqlQuery query(db);    // 创建SQL查询对象
-        bool ok = query.exec(R"(    // 执行SQL查询（创建表）
+        dbName = QDir(dirPath).absoluteFilePath("experiments.db");
+    }
+    return dbName;
+}
+
+// 打开数据库，并确保新数据库和已有的空数据库都包含实验表。
+bool DatabaseManager::openDatabase() {
+    m_lastError.clear();
+    if (dbName.isEmpty()) {
+        m_lastError = QStringLiteral("No database selected.");
+        return false;
+    }
+    if (!db.isValid())
+        db = QSqlDatabase::addDatabase("QSQLITE");
+    if (db.databaseName() != dbName) {
+        db.close();
+        db.setDatabaseName(dbName);
+    }
+    if (!db.isOpen() && !db.open()) {
+        m_lastError = db.lastError().text();
+        qWarning() << "Failed to open database:" << dbName << m_lastError;
+        return false;
+    }
+
+    QSqlQuery query(db);
+    if (!query.exec(R"(
         CREATE TABLE IF NOT EXISTS experiments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
@@ -50,39 +67,33 @@ QString DatabaseManager::initDatabase() {
             updated_time TEXT DEFAULT (datetime('now', 'localtime')),
             note TEXT
         )
-    )");
-        if (ok) {
-            qDebug() << "Table created successfully";
-            dbName = "experiments.db";
-        }
-        else {
-            qDebug() << "Failed to create table";
-            dbName = "";
-        }
-    }
-    return dbName;
-}
-
-// 打开数据库
-bool DatabaseManager::openDatabase() {
-    if (dbName.isEmpty())
+    )")) {
+        m_lastError = query.lastError().text();
+        qWarning() << "Failed to create experiments table:" << dbName << m_lastError;
+        db.close();
         return false;
-    if (!db.isValid()) {
-        db = QSqlDatabase::addDatabase("QSQLITE");
-        db.setDatabaseName(dbName);
     }
-    if (!db.open())
-        return false;
+    qDebug() << "Experiment database ready:" << dbName;
     return true;
 }
 
 // 通过id进行删除
 bool DatabaseManager::deleteExperiment(int id) {
+    m_lastError.clear();
     QSqlQuery query(db);
-    query.prepare("DELETE FROM experiments WHERE id = :id");
+    if (!query.prepare("DELETE FROM experiments WHERE id = :id")) {
+        m_lastError = query.lastError().text();
+        qWarning() << "Failed to prepare experiment deletion:" << m_lastError;
+        return false;
+    }
     query.bindValue(":id", id);
     if (!query.exec()) {
-        qDebug() << "Failed to delete experiment:" << query.lastError().text();
+        m_lastError = query.lastError().text();
+        qWarning() << "Failed to delete experiment:" << m_lastError;
+        return false;
+    }
+    if (query.numRowsAffected() != 1) {
+        m_lastError = QStringLiteral("Experiment record no longer exists.");
         return false;
     }
     return true;
@@ -90,8 +101,9 @@ bool DatabaseManager::deleteExperiment(int id) {
 
 // 插入实验数据
 bool DatabaseManager::insertExperiment(const ExperimentRecord &record) {
+    m_lastError.clear();
     QSqlQuery query(db);
-    query.prepare("INSERT INTO experiments "
+    if (!query.prepare("INSERT INTO experiments "
                             "(name, csv_path, best_epoch, "
                             "precision_value, recall_value, best_map50, "
                             "best_map5095, params, GFLOPs, "
@@ -99,7 +111,11 @@ bool DatabaseManager::insertExperiment(const ExperimentRecord &record) {
                             "VALUES (:name, :csv_path, :best_epoch,"
                             " :precision_value, :recall_value, :best_map50,"
                             " :best_map5095, :params, :GFLOPs, "
-                            ":created_time, :updated_time, :note)");
+                            ":created_time, :updated_time, :note)")) {
+        m_lastError = query.lastError().text();
+        qWarning() << "Failed to prepare experiment insert:" << m_lastError;
+        return false;
+    }
     query.bindValue(":name", record.name);
     query.bindValue(":csv_path", record.csvPath);
     query.bindValue(":best_epoch", record.bestEpoch);
@@ -113,27 +129,36 @@ bool DatabaseManager::insertExperiment(const ExperimentRecord &record) {
     query.bindValue(":updated_time", record.updatedTime);
     query.bindValue(":note", record.note);
     if (!query.exec()) {
-        qDebug() << "Failed to insert experiment:" << query.lastError().text();
+        m_lastError = query.lastError().text();
+        qWarning() << "Failed to insert experiment:" << m_lastError;
         return false;
-    }else {
-        query.exec("SELECT * FROM experiments");
     }
     return true;
 }
 
 // 更新实验数据
 bool DatabaseManager::updateExperiment(int id, const ExperimentRecord &record) {
+    m_lastError.clear();
     QSqlQuery query(db);
-    query.prepare("UPDATE experiments "
+    if (!query.prepare("UPDATE experiments "
                   "SET name = :name, params = :params, GFLOPs = :GFLOPs, note = :note "
-                  "WHERE id = :id");
+                  "WHERE id = :id")) {
+        m_lastError = query.lastError().text();
+        qWarning() << "Failed to prepare experiment update:" << m_lastError;
+        return false;
+    }
     query.bindValue(":id", id);
     query.bindValue(":name", record.name);
     query.bindValue(":params", record.params);
     query.bindValue(":GFLOPs", record.GFLOPs);
     query.bindValue(":note", record.note);
     if (!query.exec()) {
-        qDebug() << "Failed to update experiment:" << query.lastError().text();
+        m_lastError = query.lastError().text();
+        qWarning() << "Failed to update experiment:" << m_lastError;
+        return false;
+    }
+    if (query.numRowsAffected() != 1) {
+        m_lastError = QStringLiteral("Experiment record no longer exists.");
         return false;
     }
     return true;

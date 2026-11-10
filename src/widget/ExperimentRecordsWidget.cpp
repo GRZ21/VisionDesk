@@ -12,6 +12,7 @@
 #include <QSqlError>
 #include <ui_ImportExperimentDialog.h>
 #include <QSqlRecord>
+#include <cmath>
 #include "CsvAnalyzeWidget.h"
 #include "ImportExperimentDialog.h"
 #include "database/DatabaseManager.h"
@@ -47,6 +48,9 @@ ExperimentRecordsWidget::ExperimentRecordsWidget(QWidget *parent) : QWidget(pare
 
     // 单行选中
     ui->tableExperimentRecords->setSelectionMode(QAbstractItemView::SingleSelection);
+    // 修改统一由右侧详情提交，避免模型中未提交的单元格编辑污染撤销快照。
+    ui->tableExperimentRecords->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    updateRecordActions();
 
     // 行交替颜色
     ui->tableExperimentRecords->setAlternatingRowColors(true);
@@ -144,10 +148,11 @@ void ExperimentRecordsWidget::initTable() {
 
     connect(ui->tableExperimentRecords->selectionModel(), &QItemSelectionModel::currentRowChanged,
             this, &ExperimentRecordsWidget::do_currentRowChanged);
+    connect(selectionModel, &QItemSelectionModel::selectionChanged,
+            this, &ExperimentRecordsWidget::updateRecordActions);
 
     // 启用提交和撤销按钮
-    ui->btnSubmit->setEnabled(selectionModel->hasSelection());
-    ui->btnRevert->setEnabled(selectionModel->hasSelection());
+    updateRecordActions();
 
     updateStatusBar();  // 更新状态栏
 }
@@ -161,6 +166,37 @@ void ExperimentRecordsWidget::setCsvAnalyzeWidget(CsvAnalyzeWidget *csvWidget) {
 void ExperimentRecordsWidget::updateStatusBar() {
     ui->labelConnectStatus->setText("状态：已连接");
     ui->labelRecordStatus->setText("记录数：" + QString::number(tableModel->rowCount()));
+    updateRecordActions();
+}
+
+void ExperimentRecordsWidget::updateRecordActions() {
+    const bool hasCurrentRecord = selectionModel && selectionModel->hasSelection()
+                                  && selectionModel->currentIndex().isValid()
+                                  && tableModel && selectionModel->currentIndex().row() < tableModel->rowCount();
+    ui->btnSubmit->setEnabled(hasCurrentRecord);
+    ui->btnDeleteRecord->setEnabled(hasCurrentRecord);
+    ui->btnRevert->setEnabled(!recordsStack.isEmpty());
+}
+
+void ExperimentRecordsWidget::refreshAndSelectRecord(int id) {
+    if (!tableModel->select()) {
+        updateRecordActions();
+        QMessageBox::warning(this, "刷新失败", tableModel->lastError().text());
+        return;
+    }
+    // 排序后目标记录可能位于尚未加载的批次中。
+    while (tableModel->canFetchMore())
+        tableModel->fetchMore();
+    selectionModel->clear();
+    displayRecordDetails(QSqlRecord());
+    for (int row = 0; row < tableModel->rowCount(); ++row) {
+        if (tableModel->record(row).value("id").toInt() == id) {
+            ui->tableExperimentRecords->selectRow(row);
+            displayRecordDetails(tableModel->record(row));
+            break;
+        }
+    }
+    updateStatusBar();
 }
 
 // 导入当前实验
@@ -187,8 +223,11 @@ void ExperimentRecordsWidget::on_btnImportCurrentExperiment_clicked() {
     if (result==QDialog::Accepted) {    // 如果用户点击了“确定”按钮
         ExperimentRecord record = dialog->getRecord();  // 获取实验记录信息
         DatabaseManager& db = DatabaseManager::instance(); // 创建数据库管理器实例
-        db.insertExperiment(record);    // 插入这条记录
-        tableModel->select();   // 重新选择数据以更新表格
+        if (db.insertExperiment(record)) {
+            tableModel->select();   // 重新选择数据以更新表格
+        } else {
+            QMessageBox::warning(this, "导入失败", db.lastError());
+        }
     }
     delete dialog;
     updateStatusBar();
@@ -202,6 +241,10 @@ void ExperimentRecordsWidget::on_btnRefreshRecord_clicked() {
 
 // 删除记录
 void ExperimentRecordsWidget::on_btnDeleteRecord_clicked() {
+    if (!tableModel || !selectionModel || !selectionModel->hasSelection()
+        || !selectionModel->currentIndex().isValid()
+        || selectionModel->currentIndex().row() >= tableModel->rowCount())
+        return;
     int row = selectionModel->currentIndex().row();     // 获取当前选中的行
     QSqlRecord record = tableModel->record(row);     // 获取当前行的记录
     int id = record.value("id").toInt();     // 获取记录的ID
@@ -209,61 +252,71 @@ void ExperimentRecordsWidget::on_btnDeleteRecord_clicked() {
     if (QMessageBox::question(this, "提示", "是否删除该记录？") == QMessageBox::Yes) {
         qDebug() << "Deleting record with id:" << id;
         DatabaseManager& db = DatabaseManager::instance();
-        db.deleteExperiment(id);
-        tableModel->select();
+        if (!db.deleteExperiment(id)) {
+            QMessageBox::warning(this, "删除失败", db.lastError());
+            return;
+        }
+        // 已删除记录不能再通过修改历史撤销，保留其他记录的历史顺序。
+        for (int i = recordsStack.size() - 1; i >= 0; --i) {
+            if (recordsStack.at(i).value("id").toInt() == id)
+                recordsStack.removeAt(i);
+        }
+        refreshAndSelectRecord(-1);
     }
     updateStatusBar();
 }
 
 // 提交本次修改
 void ExperimentRecordsWidget::on_btnSubmit_clicked() {
+    if (!tableModel || !selectionModel || !selectionModel->hasSelection()
+        || !selectionModel->currentIndex().isValid()
+        || selectionModel->currentIndex().row() >= tableModel->rowCount()) {
+        QMessageBox::warning(this, "提示", "请先选择一条实验记录");
+        return;
+    }
     bool ok;
     // 获取当前行的记录
     QSqlRecord record = tableModel->record(selectionModel->currentIndex().row());
     ExperimentRecord experimentRecord;  // 创建ExperimentRecord空对象
     experimentRecord.name = ui->editDetailName->text();
     experimentRecord.params = ui->editParams->text().toDouble(&ok); // 将参数量文本转换为double
-    if (!ok) {
-        QMessageBox::warning(this, "提示", "请输入有效的参数量");
-        ui->editParams->clear();
+    if (!ok || !std::isfinite(experimentRecord.params) || experimentRecord.params < 0) {
+        QMessageBox::warning(this, "提示", "请输入有效的非负参数量");
+        ui->editParams->setFocus();
         return;
     }
     experimentRecord.GFLOPs = ui->editGFLOPs->text().toDouble(&ok); // 将计算量文本转换为double
-    if (!ok) {
-        QMessageBox::warning(this, "提示", "请输入有效的计算量");
-        ui->editGFLOPs->clear();
+    if (!ok || !std::isfinite(experimentRecord.GFLOPs) || experimentRecord.GFLOPs < 0) {
+        QMessageBox::warning(this, "提示", "请输入有效的非负计算量");
+        ui->editGFLOPs->setFocus();
         return;
     }
     experimentRecord.note = ui->plainNote->toPlainText();   // 获取备注
 
-    // 如果没有进行任何修改，则弹出栈顶记录并返回
+    // 没有修改时不改变撤销历史。
     if (record.value("name").toString()==experimentRecord.name&&
         record.value("params").toDouble()==experimentRecord.params&&
         record.value("GFLOPs").toDouble()==experimentRecord.GFLOPs&&
         record.value("note").toString()==experimentRecord.note) {
-        recordsStack.pop();
-        QMessageBox::warning(this, "提示", "没有进行任何修改");
+        QMessageBox::information(this, "提示", "没有进行任何修改");
         return;
     }
-    // 如果有修改，将记录压入栈中，并更新记录
-    recordsStack.push(record);
     int id = record.value("id").toInt();
     DatabaseManager& db = DatabaseManager::instance();
-    db.updateExperiment(id, experimentRecord);
-    tableModel->select();
-    for (int i = 0;i<tableModel->rowCount();i++) {
-        if (tableModel->record(i).value("id").toInt() == id) {
-            ui->tableExperimentRecords->selectRow(i);
-            break;
-        }
+    if (!db.updateExperiment(id, experimentRecord)) {
+        QMessageBox::warning(this, "提交失败", db.lastError());
+        return;
     }
+    // 仅成功写入后保存修改前的快照。
+    recordsStack.push(record);
+    refreshAndSelectRecord(id);
 }
 
 // 撤销本次修改
 void ExperimentRecordsWidget::on_btnRevert_clicked() {
     QSqlRecord record;
     if (!recordsStack.isEmpty()) {
-        record = recordsStack.pop();
+        record = recordsStack.top();
     }else {
         QMessageBox::warning(this, "提示", "没有可撤销的记录");
         return;
@@ -274,14 +327,13 @@ void ExperimentRecordsWidget::on_btnRevert_clicked() {
     experimentRecord.GFLOPs = record.value("GFLOPs").toDouble();
     experimentRecord.note = record.value("note").toString();
     DatabaseManager& db = DatabaseManager::instance();
-    db.updateExperiment(record.value("id").toInt(), experimentRecord);
-    tableModel->select();
-    for (int i = 0; i < tableModel->rowCount(); i++) {
-        if (tableModel->record(i).value("id").toInt() == record.value("id").toInt()) {
-            ui->tableExperimentRecords->selectRow(i);
-            break;
-        }
+    const int id = record.value("id").toInt();
+    if (!db.updateExperiment(id, experimentRecord)) {
+        QMessageBox::warning(this, "撤销失败", db.lastError());
+        return;
     }
+    recordsStack.pop();
+    refreshAndSelectRecord(id);
 }
 
 // 导出记录为xlsx
@@ -308,6 +360,7 @@ void ExperimentRecordsWidget::on_comboSortExperiment_currentTextChanged(const QS
     else if (sortType == "升序")
         tableModel->setSort(tableModel->fieldIndex(sortKey), Qt::AscendingOrder);
     tableModel->select();
+    updateStatusBar();
 }
 
 // 选择排序类型，是升序还是降序
@@ -329,6 +382,7 @@ void ExperimentRecordsWidget::on_comboBoxSortType_currentTextChanged(const QStri
     else if (sortType == "升序")
         tableModel->setSort(tableModel->fieldIndex(sortKey), Qt::AscendingOrder);
     tableModel->select();
+    updateStatusBar();
 }
 
 // 根据输入框中的关键字进行搜索
@@ -341,15 +395,17 @@ void ExperimentRecordsWidget::on_editSearchExperiment_textChanged(const QString 
             .arg(keyword)
     );
     tableModel->select();
+    if (tableModel->rowCount() == 0)
+        displayRecordDetails(QSqlRecord());
+    updateStatusBar();
 }
 
 // 当前行改变时显示记录详情
 void ExperimentRecordsWidget::do_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous);
-    QSqlRecord record = tableModel->record(current.row());
+    QSqlRecord record = current.isValid() ? tableModel->record(current.row()) : QSqlRecord();
     displayRecordDetails(record);
-    ui->btnSubmit->setEnabled(true);
-    ui->btnRevert->setEnabled(true);
+    updateRecordActions();
 }
 
 // 显示记录详情

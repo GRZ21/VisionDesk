@@ -50,13 +50,15 @@ private slots:
     void do_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
-    QSqlTableModel *tableModel;
-    QItemSelectionModel *selectionModel;
-    QDataWidgetMapper *mapper;
+    QSqlTableModel *tableModel = nullptr;
+    QItemSelectionModel *selectionModel = nullptr;
+    QDataWidgetMapper *mapper = nullptr;
     CsvAnalyzeWidget *m_csvWidget = nullptr;
     QStack<QSqlRecord> recordsStack;
 
     void displayRecordDetails(QSqlRecord record);
+    void updateRecordActions();
+    void refreshAndSelectRecord(int id);
 
 public slots:
     void restoreLayout();

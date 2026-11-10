@@ -1,0 +1,1931 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ResultVisualization</class>
+ <widget class="QWidget" name="ResultVisualization">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1400</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1200</width>
+    <height>720</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>检测可视化</string>
+  </property>
+  <property name="styleSheet">
+   <string>QWidget#ResultVisualization { background: #ffffff; color: #334155; font: 13px &quot;Microsoft YaHei&quot;; }
+QWidget#ResultVisualization QLabel { color: #334155; background: transparent; border: none; }
+QWidget#ResultVisualization QPushButton { background: #ffffff; color: #334155; border: 1px solid #cfdbea; border-radius: 5px; padding: 5px 10px; }
+QWidget#ResultVisualization QPushButton:hover { background: #edf5ff; border-color: #7aade4; }
+QWidget#ResultVisualization QPushButton:pressed { background: #deedff; }
+QWidget#ResultVisualization QPushButton#startInferenceButton { background: #347ed3; color: white; border-color: #347ed3; font-weight: 600; }
+QWidget#ResultVisualization QPushButton#clearResultsButton { color: #c84444; }
+QWidget#ResultVisualization QLineEdit, QWidget#ResultVisualization QComboBox, QWidget#ResultVisualization QDoubleSpinBox { min-height: 28px; border: 1px solid #d5dfeb; border-radius: 4px; background: #f8fafc; padding: 2px 6px; }
+QWidget#ResultVisualization QLineEdit#modelPathEdit { background: #f1f4f7; color: #64748b; }
+QWidget#ResultVisualization QListWidget, QWidget#ResultVisualization QTableWidget { background: white; border: 1px solid #dbe4ef; border-radius: 3px; selection-background-color: #e7f1ff; selection-color: #245f9c; outline: none; }
+QWidget#ResultVisualization QListWidget::item { padding: 6px; border-bottom: 1px solid #e8edf4; }
+QWidget#ResultVisualization QListWidget::item:selected { background: #eaf3ff; border: 1px solid #7fb2ed; }
+QWidget#ResultVisualization QHeaderView::section { background: #f3f6fa; color: #475569; border: none; border-right: 1px solid #e0e7ef; border-bottom: 1px solid #dbe4ef; padding: 7px 4px; font-weight: 600; }
+QWidget#ResultVisualization QSlider::groove:horizontal { height: 4px; background: #e8edf4; border-radius: 2px; }
+QWidget#ResultVisualization QSlider::sub-page:horizontal { background: #347ed3; border-radius: 2px; }
+QWidget#ResultVisualization QSlider::handle:horizontal { background: white; border: 1px solid #94a3b8; width: 16px; height: 16px; margin: -6px 0; border-radius: 9px; }
+QWidget#ResultVisualization QSlider::handle:horizontal { min-height: 16px; }
+QWidget#ResultVisualization QComboBox::drop-down { width: 20px; border: none; }
+QWidget#ResultVisualization QDoubleSpinBox::up-button, QWidget#ResultVisualization QDoubleSpinBox::down-button { width: 16px; }
+</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout" stretch="1,0">
+   <property name="spacing">
+    <number>14</number>
+   </property>
+   <property name="leftMargin">
+    <number>14</number>
+   </property>
+   <property name="topMargin">
+    <number>14</number>
+   </property>
+   <property name="rightMargin">
+    <number>14</number>
+   </property>
+   <property name="bottomMargin">
+    <number>14</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="contentLayout" stretch="0,1,0">
+     <property name="spacing">
+      <number>16</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <layout class="QVBoxLayout" name="leftPanelLayout" stretch="0,1">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QFrame" name="modelDataCard">
+         <property name="styleSheet">
+          <string>QFrame#modelDataCard { background: white; border: 1px solid #d9e2ed; border-radius: 5px; }</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <layout class="QVBoxLayout" name="modelDataCardLayout">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <property name="leftMargin">
+           <number>10</number>
+          </property>
+          <property name="topMargin">
+           <number>10</number>
+          </property>
+          <property name="rightMargin">
+           <number>10</number>
+          </property>
+          <property name="bottomMargin">
+           <number>10</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="modelDataCardTitle">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>28</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string>font-weight: 600; color: #355b80; background: #f2f5f9; border: none; padding: 6px; min-height: 16px;</string>
+            </property>
+            <property name="text">
+             <string>模型与数据</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="importModelButton">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>36</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>导入 ONNX 模型</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="modelPathEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>尚未导入 ONNX 模型</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="confidenceTitleLabel">
+            <property name="text">
+             <string>置信度阈值</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="confidenceControlLayout" stretch="1,0">
+            <property name="spacing">
+             <number>10</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QSlider" name="confidenceSlider">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>25</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="confidenceSpinBox">
+              <property name="minimumSize">
+               <size>
+                <width>68</width>
+                <height>34</height>
+               </size>
+              </property>
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.250000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="confidenceRangeLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="confidenceMinimumLabel">
+              <property name="text">
+               <string>0.00</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="confidenceRangeSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>12</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="confidenceMaximumLabel">
+              <property name="text">
+               <string>1.00</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="nmsTitleLabel">
+            <property name="text">
+             <string>NMS 阈值</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="nmsControlLayout" stretch="1,0">
+            <property name="spacing">
+             <number>10</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QSlider" name="nmsSlider">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="value">
+               <number>45</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="nmsSpinBox">
+              <property name="minimumSize">
+               <size>
+                <width>68</width>
+                <height>34</height>
+               </size>
+              </property>
+              <property name="maximum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.450000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="nmsRangeLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="nmsMinimumLabel">
+              <property name="text">
+               <string>0.00</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="nmsRangeSpacer">
+              <property name="orientation">
+               <enum>Qt::Orientation::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>12</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="nmsMaximumLabel">
+              <property name="text">
+               <string>1.00</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="classFilterLayout" stretch="0,1">
+            <property name="spacing">
+             <number>12</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="classFilterLabel">
+              <property name="text">
+               <string>类别显示</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="classFilterComboBox">
+              <item>
+               <property name="text">
+                <string>全部类别</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="openImageLayout">
+            <property name="spacing">
+             <number>10</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="openImageButton">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>36</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>打开图片</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="openDirectoryButton">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>36</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>打开文件夹</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="startInferenceButton">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>36</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>开始推理</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="clearResultsButton">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>36</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>清空结果</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="imageListCard">
+         <property name="styleSheet">
+          <string>QFrame#imageListCard { background: white; border: 1px solid #d9e2ed; border-radius: 5px; }</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <layout class="QVBoxLayout" name="imageListCardLayout">
+          <property name="spacing">
+           <number>8</number>
+          </property>
+          <property name="leftMargin">
+           <number>10</number>
+          </property>
+          <property name="topMargin">
+           <number>10</number>
+          </property>
+          <property name="rightMargin">
+           <number>10</number>
+          </property>
+          <property name="bottomMargin">
+           <number>10</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="imageListHeaderLayout" stretch="1,0">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="imageListCardTitle">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string>font-weight: 600; color: #355b80; background: #f2f5f9; border: none; padding: 6px; min-height: 16px;</string>
+              </property>
+              <property name="text">
+               <string>待检测图片 (0)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="refreshImagesButton">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>36</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>52</width>
+                <height>36</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>刷新图片列表</string>
+              </property>
+              <property name="text">
+               <string>刷新</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QListWidget" name="imageListWidget">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>50</width>
+              <height>42</height>
+             </size>
+            </property>
+            <property name="spacing">
+             <number>2</number>
+            </property>
+            <property name="uniformItemSizes">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="centerPanelLayout" stretch="0,1,0">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="imageToolbarLayout">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="previousImageButton">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>上一张</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="nextImageButton">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>下一张</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="toolbarSpacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>12</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="saveResultButton">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>保存结果</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="toolbarSeparator">
+           <property name="styleSheet">
+            <string>color: #d9e2ed;</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::VLine</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Shadow::Plain</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="zoomOutButton">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>缩小</string>
+           </property>
+           <property name="text">
+            <string>−</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="zoomComboBox">
+           <property name="minimumSize">
+            <size>
+             <width>76</width>
+             <height>34</height>
+            </size>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="currentIndex">
+            <number>3</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>25%</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>50%</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>75%</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>100%</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>125%</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>150%</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>200%</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="zoomInButton">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>放大</string>
+           </property>
+           <property name="text">
+            <string>+</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fitToWindowButton">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>适应窗口</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fullScreenButton">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>全屏预览</string>
+           </property>
+           <property name="text">
+            <string>全屏</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QScrollArea" name="imageScrollArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>380</width>
+           <height>280</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string>QScrollArea#imageScrollArea { background: #f4f7fb; border: 1px solid #d9e2ed; border-radius: 5px; }
+QScrollArea#imageScrollArea &gt; QWidget &gt; QWidget { background: #f4f7fb; }</string>
+         </property>
+         <property name="widgetResizable">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+         <widget class="QLabel" name="imageLabel">
+          <property name="geometry">
+           <rect>
+            <x>189</x>
+            <y>169</y>
+            <width>380</width>
+            <height>280</height>
+           </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string>QLabel#imageLabel { background: #f4f7fb; border: none; color: #94a3b8; font-size: 16px; }</string>
+          </property>
+          <property name="text">
+           <string>尚未加载图片
+
+请从左侧打开图片或文件夹</string>
+          </property>
+          <property name="scaledContents">
+           <bool>false</bool>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="thumbnailLayout" stretch="0,1,0">
+         <property name="spacing">
+          <number>8</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="previousThumbnailsButton">
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>132</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>132</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>上一组缩略图</string>
+           </property>
+           <property name="text">
+            <string>&lt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QListWidget" name="thumbnailListWidget">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>132</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>132</height>
+            </size>
+           </property>
+           <property name="verticalScrollBarPolicy">
+            <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>116</width>
+             <height>82</height>
+            </size>
+           </property>
+           <property name="movement">
+            <enum>QListView::Movement::Static</enum>
+           </property>
+           <property name="flow">
+            <enum>QListView::Flow::LeftToRight</enum>
+           </property>
+           <property name="resizeMode">
+            <enum>QListView::ResizeMode::Adjust</enum>
+           </property>
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <property name="gridSize">
+            <size>
+             <width>136</width>
+             <height>114</height>
+            </size>
+           </property>
+           <property name="viewMode">
+            <enum>QListView::ViewMode::IconMode</enum>
+           </property>
+           <property name="wrapping" stdset="0">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="nextThumbnailsButton">
+           <property name="minimumSize">
+            <size>
+             <width>32</width>
+             <height>132</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>132</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>下一组缩略图</string>
+           </property>
+           <property name="text">
+            <string>&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QScrollArea" name="rightScrollArea">
+       <property name="minimumSize">
+        <size>
+         <width>296</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>316</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Shape::NoFrame</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="rightPanel">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>280</width>
+          <height>826</height>
+         </rect>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>280</width>
+          <height>760</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="rightPanelLayout" stretch="0,0,1,0,0">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QFrame" name="inferenceInfoCard">
+           <property name="styleSheet">
+            <string>QFrame#inferenceInfoCard { background: white; border: 1px solid #d9e2ed; border-radius: 5px; }</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <layout class="QVBoxLayout" name="inferenceInfoCardLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>10</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <property name="rightMargin">
+             <number>10</number>
+            </property>
+            <property name="bottomMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="inferenceInfoCardTitle">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string>font-weight: 600; color: #355b80; background: #f2f5f9; border: none; padding: 6px; min-height: 16px;</string>
+              </property>
+              <property name="text">
+               <string>推理结果</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="modelNameRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="modelNameCaption">
+                <property name="text">
+                 <string>模型名称：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="modelNameValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>—</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="deviceRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="deviceCaption">
+                <property name="text">
+                 <string>推理设备：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="deviceValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>CPU</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="inferenceTimeRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="inferenceTimeCaption">
+                <property name="text">
+                 <string>推理时间：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="inferenceTimeValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>—</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="detectionCountRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="detectionCountCaption">
+                <property name="text">
+                 <string>检测到目标：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="detectionCountValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>0</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="imageInfoCard">
+           <property name="styleSheet">
+            <string>QFrame#imageInfoCard { background: white; border: 1px solid #d9e2ed; border-radius: 5px; }</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <layout class="QVBoxLayout" name="imageInfoCardLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>10</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <property name="rightMargin">
+             <number>10</number>
+            </property>
+            <property name="bottomMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="imageInfoCardTitle">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string>font-weight: 600; color: #355b80; background: #f2f5f9; border: none; padding: 6px; min-height: 16px;</string>
+              </property>
+              <property name="text">
+               <string>图片信息</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="imageNameRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="imageNameCaption">
+                <property name="text">
+                 <string>图片名称：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="imageNameValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>—</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="imageSizeRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="imageSizeCaption">
+                <property name="text">
+                 <string>图片尺寸：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="imageSizeValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>—</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="fileSizeRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="fileSizeCaption">
+                <property name="text">
+                 <string>文件大小：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="fileSizeValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>—</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="captureTimeRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="captureTimeCaption">
+                <property name="text">
+                 <string>拍摄时间：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="captureTimeValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>—</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="detectionsCard">
+           <property name="styleSheet">
+            <string>QFrame#detectionsCard { background: white; border: 1px solid #d9e2ed; border-radius: 5px; }</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <layout class="QVBoxLayout" name="detectionsCardLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>10</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <property name="rightMargin">
+             <number>10</number>
+            </property>
+            <property name="bottomMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="detectionsCardTitle">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string>font-weight: 600; color: #355b80; background: #f2f5f9; border: none; padding: 6px; min-height: 16px;</string>
+              </property>
+              <property name="text">
+               <string>检测结果列表</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="detectionsTableWidget">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>130</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string>font-size: 11px; gridline-color: #e2e8f0;</string>
+              </property>
+              <property name="editTriggers">
+               <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+              </property>
+              <property name="showGrid">
+               <bool>true</bool>
+              </property>
+              <attribute name="horizontalHeaderDefaultSectionSize">
+               <number>58</number>
+              </attribute>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <attribute name="verticalHeaderVisible">
+               <bool>false</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>ID</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>类别</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>置信度</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>框坐标 (x1,y1,x2,y2)</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="classLegendCard">
+           <property name="styleSheet">
+            <string>QFrame#classLegendCard { background: white; border: 1px solid #d9e2ed; border-radius: 5px; }</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <layout class="QVBoxLayout" name="classLegendCardLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>10</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <property name="rightMargin">
+             <number>10</number>
+            </property>
+            <property name="bottomMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="classLegendCardTitle">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string>font-weight: 600; color: #355b80; background: #f2f5f9; border: none; padding: 6px; min-height: 16px;</string>
+              </property>
+              <property name="text">
+               <string>类别图例</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="classLegendPlaceholderLabel">
+              <property name="text">
+               <string>导入模型后显示类别图例</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="statisticsCard">
+           <property name="styleSheet">
+            <string>QFrame#statisticsCard { background: white; border: 1px solid #d9e2ed; border-radius: 5px; }</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Shape::StyledPanel</enum>
+           </property>
+           <layout class="QVBoxLayout" name="statisticsCardLayout">
+            <property name="spacing">
+             <number>8</number>
+            </property>
+            <property name="leftMargin">
+             <number>10</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
+            </property>
+            <property name="rightMargin">
+             <number>10</number>
+            </property>
+            <property name="bottomMargin">
+             <number>10</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="statisticsCardTitle">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>28</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string>font-weight: 600; color: #355b80; background: #f2f5f9; border: none; padding: 6px; min-height: 16px;</string>
+              </property>
+              <property name="text">
+               <string>统计信息</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="totalImagesRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="totalImagesCaption">
+                <property name="text">
+                 <string>图片总数：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="totalImagesValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>0</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="currentIndexRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="currentIndexCaption">
+                <property name="text">
+                 <string>当前索引：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="currentIndexValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>0 / 0</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="totalDetectionsRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="totalDetectionsCaption">
+                <property name="text">
+                 <string>本次检测总数：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="totalDetectionsValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>0</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="averageConfidenceRow">
+              <property name="spacing">
+               <number>8</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="averageConfidenceCaption">
+                <property name="text">
+                 <string>平均置信度：</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="averageConfidenceValue">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>—</string>
+                </property>
+                <property name="textInteractionFlags">
+                 <set>Qt::TextInteractionFlag::TextSelectableByMouse</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFrame" name="statusFrame">
+     <property name="styleSheet">
+      <string>QFrame#statusFrame { background: #fbfcfe; border: 1px solid #d9e2ed; border-radius: 4px; }</string>
+     </property>
+     <layout class="QHBoxLayout" name="statusLayout">
+      <property name="spacing">
+       <number>16</number>
+      </property>
+      <property name="leftMargin">
+       <number>12</number>
+      </property>
+      <property name="topMargin">
+       <number>12</number>
+      </property>
+      <property name="rightMargin">
+       <number>12</number>
+      </property>
+      <property name="bottomMargin">
+       <number>12</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="modelStatusLabel">
+        <property name="text">
+         <string>模型：未加载</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="statusSeparator1">
+        <property name="styleSheet">
+         <string>color: #d9e2ed;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::VLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Plain</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="deviceStatusLabel">
+        <property name="text">
+         <string>设备：CPU</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="statusSeparator2">
+        <property name="styleSheet">
+         <string>color: #d9e2ed;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::VLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Plain</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="imageCountStatusLabel">
+        <property name="text">
+         <string>图片数： 0</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="statusSeparator3">
+        <property name="styleSheet">
+         <string>color: #d9e2ed;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::VLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Plain</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="stateStatusLabel">
+        <property name="text">
+         <string>状态：就绪</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="statusSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>12</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

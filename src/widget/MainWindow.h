@@ -25,6 +25,7 @@ QT_END_NAMESPACE
 
 class CsvAnalyzeWidget;
 class ExperimentRecordsWidget;
+class ResultVisualization;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -41,6 +42,8 @@ private:
     Ui::MainWindow *ui;
     CsvAnalyzeWidget* csvAnalyzeWidget = nullptr;
     ExperimentRecordsWidget* experimentRecordsWidget = nullptr;
+    ResultVisualization* resultVisualization = nullptr;
+
 };
 
 

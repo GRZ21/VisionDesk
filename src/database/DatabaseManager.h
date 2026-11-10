@@ -31,6 +31,7 @@ public:
     QString initDatabase();
 
     bool openDatabase();
+    QString lastError() const { return m_lastError; }
 
     bool deleteExperiment(int id);
     bool insertExperiment(const ExperimentRecord& record);
@@ -43,6 +44,7 @@ private:
 private:
     QSqlDatabase db;
     QString dbName;
+    QString m_lastError;
 };
 
 

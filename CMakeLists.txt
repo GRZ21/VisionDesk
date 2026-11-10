@@ -61,6 +61,48 @@ find_package(Qt6 REQUIRED COMPONENTS
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# ---------------- OpenCV ----------------
+# 在 CMake 选项中设置 -DOpenCV_DIR=<包含 OpenCVConfig.cmake 的目录>
+find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs)
+
+# ---------------- ONNX Runtime ----------------
+# 指向解压后的 SDK 根目录，其中应包含 include 和 lib 目录。
+set(ONNXRUNTIME_ROOT "" CACHE PATH "ONNX Runtime SDK root directory")
+find_path(ONNXRUNTIME_INCLUDE_DIR onnxruntime_cxx_api.h
+        HINTS "${ONNXRUNTIME_ROOT}"
+        PATH_SUFFIXES include include/onnxruntime/core/session
+)
+find_library(ONNXRUNTIME_LIBRARY NAMES onnxruntime
+        HINTS "${ONNXRUNTIME_ROOT}"
+        PATH_SUFFIXES lib lib64
+)
+if (NOT ONNXRUNTIME_INCLUDE_DIR OR NOT ONNXRUNTIME_LIBRARY)
+    message(FATAL_ERROR "ONNX Runtime SDK not found. Set -DONNXRUNTIME_ROOT=<SDK directory>.")
+endif ()
+
+add_library(ONNXRuntime::ONNXRuntime SHARED IMPORTED)
+set_target_properties(ONNXRuntime::ONNXRuntime PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${ONNXRUNTIME_INCLUDE_DIR}"
+)
+if (WIN32)
+    get_filename_component(ONNXRUNTIME_LIBRARY_DIR "${ONNXRUNTIME_LIBRARY}" DIRECTORY)
+    find_file(ONNXRUNTIME_DLL NAMES onnxruntime.dll
+            HINTS "${ONNXRUNTIME_LIBRARY_DIR}" "${ONNXRUNTIME_ROOT}"
+            PATH_SUFFIXES lib bin
+    )
+    if (NOT ONNXRUNTIME_DLL)
+        message(FATAL_ERROR "onnxruntime.dll not found. Check ONNXRUNTIME_ROOT.")
+    endif ()
+    set_target_properties(ONNXRuntime::ONNXRuntime PROPERTIES
+            IMPORTED_IMPLIB "${ONNXRUNTIME_LIBRARY}"
+            IMPORTED_LOCATION "${ONNXRUNTIME_DLL}"
+    )
+else ()
+    set_target_properties(ONNXRuntime::ONNXRuntime PROPERTIES
+            IMPORTED_LOCATION "${ONNXRUNTIME_LIBRARY}"
+    )
+endif ()
+
 # ---------------- 源文件 ----------------
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
         src/*.cpp
@@ -92,11 +134,16 @@ add_executable(${APP_NAME}
         src/widget/ImportExperimentDialog.h
         src/widget/ImportExperimentDialog.ui
         src/resource/res.qrc
+        src/utils/loadONNX.cpp
+        src/utils/loadONNX.h
+        src/widget/ResultVisualization.cpp
+        src/widget/ResultVisualization.h
+        src/widget/ResultVisualization.ui
 )
 
 add_subdirectory(src/include/QXlsx)
 
-# ---------------- 链接 Qt ----------------
+# ---------------- 链接依赖 ----------------
 target_link_libraries(${APP_NAME} PRIVATE
         Qt6::Core
         Qt6::Gui
@@ -104,7 +151,28 @@ target_link_libraries(${APP_NAME} PRIVATE
         Qt6::PrintSupport
         Qt6::Sql
         QXlsx::QXlsx
+        ${OpenCV_LIBS}
+        ONNXRuntime::ONNXRuntime
 )
+
+# Windows 下将依赖 DLL 复制到 exe 目录，OpenCV 自动匹配 Debug/Release。
+if (WIN32)
+    add_custom_command(TARGET ${APP_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:ONNXRuntime::ONNXRuntime>" "$<TARGET_FILE_DIR:${APP_NAME}>"
+            VERBATIM
+    )
+    foreach (opencv_target IN LISTS OpenCV_LIBS)
+        get_target_property(opencv_target_type ${opencv_target} TYPE)
+        if (opencv_target_type STREQUAL "SHARED_LIBRARY")
+            add_custom_command(TARGET ${APP_NAME} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "$<TARGET_FILE:${opencv_target}>" "$<TARGET_FILE_DIR:${APP_NAME}>"
+                    VERBATIM
+            )
+        endif ()
+    endforeach ()
+endif ()
 
 # ---------------- include 路径 ----------------
 target_include_directories(${APP_NAME} PRIVATE

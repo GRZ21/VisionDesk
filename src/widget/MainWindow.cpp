@@ -7,6 +7,9 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include <QString>
+#include <ui_ResultVisualization.h>
+
+#include "ResultVisualization.h"
 #include "../utils/qcustomplot.h"
 
 
@@ -25,13 +28,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     csvAnalyzeWidget = new CsvAnalyzeWidget(this);
     experimentRecordsWidget = new ExperimentRecordsWidget(this);
+    resultVisualization = new ResultVisualization(this);
     experimentRecordsWidget->setCsvAnalyzeWidget(csvAnalyzeWidget);
     experimentRecordsWidget->initTable();
     ui->tabWidget->removeTab(0);
     ui->tabWidget->insertTab(0, csvAnalyzeWidget, "训练曲线");
     ui->tabWidget->removeTab(1);
     ui->tabWidget->insertTab(1, experimentRecordsWidget, "实验记录");
-    ui->tabWidget->removeTab(2);    // 隐藏第三个界面
+    ui->tabWidget->removeTab(2);
+    ui->tabWidget->insertTab(2, resultVisualization, "结果可视化");
     ui->tabWidget->setCurrentIndex(0); // 设置默认显示第一个界面
 
     connect(ui->actionOpen, &QAction::triggered, csvAnalyzeWidget, &CsvAnalyzeWidget::openCsvFile);
