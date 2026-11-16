@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/Platform-Windows_x64-0078D6?logo=windows" alt="Windows x64">
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
 </p>
-**VisionDesk** 是一款基于 Qt 6 和 C++17 的视觉实验桌面工具，将训练日志分析、实验归档与模型检测结果查看整合在同一个工作区中。主要面向使用 Ultralytics YOLO 训练日志和兼容 ONNX 检测模型的实验场景：对比训练曲线、整理消融实验指标、查看模型检测效果，以及导出图表和结果图片。
+VisionDesk 是一款基于 Qt 6 和 C++17 的视觉实验桌面工具，将训练日志分析、实验归档与模型检测结果查看整合在同一个工作区中。主要面向使用 Ultralytics YOLO 训练日志和兼容 ONNX 检测模型的实验场景：对比训练曲线、整理消融实验指标、查看模型检测效果，以及导出图表和结果图片。
 
 ## 界面预览
 
