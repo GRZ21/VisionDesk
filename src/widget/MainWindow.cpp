@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     resize(1400,750);
     setMinimumSize(1000,500);
-    setWindowTitle("DeepVision Workbench");
+    setWindowTitle("VisionDesk");
 
     csvAnalyzeWidget = new CsvAnalyzeWidget(this);
     experimentRecordsWidget = new ExperimentRecordsWidget(this);
@@ -88,16 +88,16 @@ MainWindow::~MainWindow() {
 
 
 void MainWindow::onActionGuide() {
-    QDesktopServices::openUrl(QUrl("https://github.com/GRZ21/DeepVisionWorkbench"));
+    QDesktopServices::openUrl(QUrl("https://github.com/GRZ21/VisionDesk"));
 }
 
 void MainWindow::onActionAbout() {
-    QString Text = "<h3>DeepVision Workbench</h3>"
-                "<p><b>开发者：</b>GRZ</p>"
+    QString Text = "<h3>VisionDesk</h3>"
+                "<p><b>开发者：</b>G RZ</p>"
                 "<p><b>联系邮箱：</b>grzgrzgrz21@foxmail.com</p>"
-                "<p><b>版本：</b>v2.0beta</p>"
+                "<p><b>版本：</b>v3.0beta</p>"
                 "<hr>"
-                "<p>基于 Qt(C++) 构建。</p>"
+                "<p>基于 Qt(C++) 和 ONNX Runtime构建。</p>"
                 "<p><b>开源协议：</b>本项目遵循 <a href='https://opensource.org/licenses/MIT'>MIT License</a>。</p>"
                 "<p><span style='font-size:10px; color:gray;'>Copyright &copy; 2026 GRZ. All rights reserved.</span></p>";
     QMessageBox box(this);

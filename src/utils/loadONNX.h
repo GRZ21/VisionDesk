@@ -2,8 +2,8 @@
 // Created by GRZ on 2026/11/3.
 //
 
-#ifndef DEEPVISIONWORKBENCH_LOADONNX_H
-#define DEEPVISIONWORKBENCH_LOADONNX_H
+#ifndef VISIONDESK_LOADONNX_H
+#define VISIONDESK_LOADONNX_H
 
 #include <filesystem>
 #include <cstdint>
@@ -66,4 +66,4 @@ int loadONNX(const std::filesystem::path &modelPath,
              int inputWidth = 640, int inputHeight = 640);
 
 
-#endif //DEEPVISIONWORKBENCH_LOADONNX_H
+#endif //VISIONDESK_LOADONNX_H

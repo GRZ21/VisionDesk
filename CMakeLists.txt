@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # ---------------- 基础 ----------------
-set(APP_NAME DeepVisionWorkbench)
+set(APP_NAME VisionDesk)
 
 project(${APP_NAME}
         VERSION 1.0.0

@@ -7,6 +7,8 @@
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+    QApplication::setApplicationName("VisionDesk");
+    QApplication::setApplicationDisplayName("VisionDesk");
 
     if (DatabaseManager::instance().initDatabase().isEmpty())
         return 0;

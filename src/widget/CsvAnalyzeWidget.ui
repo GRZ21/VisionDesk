@@ -246,32 +246,7 @@
                </layout>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkSmooth">
-                <property name="text">
-                 <string>启用平滑 (EMA)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="smoothLayout">
-                <item>
-                 <widget class="QLabel" name="labelSmoothValue">
-                  <property name="text">
-                   <string>平滑度:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSlider" name="sliderSmooth">
-                  <property name="maximum">
-                   <number>99</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Orientation::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <layout class="QHBoxLayout" name="smoothLayout"/>
               </item>
               <item>
                <widget class="QGroupBox" name="groupStats">
