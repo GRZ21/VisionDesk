@@ -244,6 +244,6 @@ ctest --test-dir build-tests --output-on-failure
 
 ## 反馈与许可
 
-欢迎通过仓库 Issues 反馈问题。涉及兼容性时，请附上程序版本、复现步骤，以及 CSV 表头或 ONNX 输入／输出形状等必要信息。
+欢迎通过仓库 Issues 反馈问题。涉及兼容性时，请附上程序版本、复现步骤，以及 CSV 表头或 ONNX 输入/输出形状等必要信息。
 
 项目自身代码采用 [MIT License](./LICENSE)。QCustomPlot、QXlsx、Qt、OpenCV 和 ONNX Runtime 等第三方组件遵循各自的许可证。
